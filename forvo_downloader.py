@@ -88,6 +88,8 @@ def do_download(result):
     with urllib.request.urlopen(url) as resp, open(dest_filename, 'wb') as dest:
         shutil.copyfileobj(resp, dest)
 
+    return dest_filename
+
 
 if __name__ == '__main__':
     config = parse_config(sys.argv)
@@ -101,4 +103,5 @@ if __name__ == '__main__':
     else:
         result = do_disambiguate(results)
 
-    do_download(result)
+    filename = do_download(result)
+    print('Saved pronuncuation to ./{}'.format(filename))
