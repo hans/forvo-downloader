@@ -35,30 +35,6 @@ def clean(path):
                    noisered_part=noisered_part, silence_part=silence_part)
     os.system(cmd)
 
-    # pron = pysox.CSoxStream(path)
-    # out = pysox.CSoxStream(cleaned_path, 'w', pron.get_signal())
-    # chain = pysox.CEffectsChain(pron, out)
-
-    # chain.add_effect(pysox.CEffect('remix', [b'1']))
-
-    # # Dynamic range compression (normalize volume)
-    # chain.add_effect(pysox.CEffect('compand', [b'0.02,0.20', b'5:-60,-40,-10',
-    #                                            b'-5', b'-90', b'0.1']))
-
-    # silence_args = [b'1', b'0.1', b'0.1%']
-
-    # # Trim silence from front
-    # chain.add_effect(pysox.CEffect('silence', silence_args))
-
-    # # Trim silence from back
-    # chain.add_effect(pysox.CEffect('reverse', []))
-    # chain.add_effect(pysox.CEffect('silence', silence_args))
-    # chain.add_effect(pysox.CEffect('reverse', []))
-
-    # # Go!
-    # chain.flow_effects()
-    # out.close()
-
     return cleaned_path
 
 
@@ -95,37 +71,5 @@ def find_noise(in_path):
     resp = input('Is this only noise? [Y/n] ')
     if resp.lower() in ['y', '']:
         return (0, 1, True)
-        # print('Generating noise profile.')
-        # return make_noise_profile(in_stream, 0, 1, reverse=True, in_path=in_path)
-    # TODO: continue attempts
 
-
-# def make_noise_profile(in_path, start_time, stop_time, reverse=True):
-#     with tempfile.NamedTemporaryFile(delete=False) as f:
-#         path = f.name
-
-#         # subprocess.call(['sox', in_path, '-n', ])
-
-#         in_stream = pysox.CSoxStream(in_path)
-#         chain = pysox.CEffectsChain(in_stream, pysox.CNullFile())
-
-#         chain.add_effect(pysox.CEffect('remix', [b'1']))
-
-#         if reverse:
-#             chain.add_effect(pysox.CEffect('reverse', []))
-
-#         chain.add_effect(pysox.CEffect('trim', [b'0', b'1']))
-#         # chain.add_effect(pysox.CEffect('trim', [str(start_time),
-#         #                                         str(stop_time)]))
-
-#         if reverse:
-#             chain.add_effect(pysox.CEffect('reverse', []))
-
-#         chain.add_effect(pysox.CEffect('noiseprof', [b'here.prof']))
-
-#         chain.flow_effects()
-#         print('here %r' % type(path))
-#         in_stream.close()
-
-#     # return path
-#     return b'here.prof
+    # TODO: Continue attempts?
