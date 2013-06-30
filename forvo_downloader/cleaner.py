@@ -5,28 +5,48 @@ import subprocess
 
 import pysox
 
-def clean(path):
+
+def noise_profile_path(username):
+    # TODO: safety
+    return './noise_profiles/{}'.format(username)
+
+
+def find_noise_profile(username):
+    path = noise_profile_path(username)
+    if os.path.isfile(path):
+        return path
+
+
+def clean(path, username, noise_profile=None):
     name, ext = path.rsplit('.', 1)
     cleaned_path = '.'.join([name, 'cleaned', ext])
+    new_profile = None
 
     remix_part = 'remix 1'
     compand_part = 'compand 0.02,0.20 5:-60,-40,-10 -5 -90 0.1'
     silence_part = 'silence 1 0.1 0.1%'
 
     noise_cmd = ''
-    do_noiseprof = True
-    noise_info = find_noise(path)
-    if noise_info is not None:
-        start, end, reverse = noise_info
-        reverse = 'reverse' if reverse else ''
+    if noise_profile is None:
+        noise_info = find_noise(path)
+        if noise_info is not None:
+            start, end, reverse = noise_info
+            reverse = 'reverse' if reverse else ''
+            profile_path = noise_profile_path(username)
 
-        noise_cmd = ('sox {path} -n {remix_part} {compand_part} {reverse} '
-                     'trim {start} {end} {reverse} noiseprof |'
-                     ).format(path=path, remix_part=remix_part, reverse=reverse,
-                              compand_part=compand_part, start=start, end=end)
-        do_noiseprof = True
+            noise_cmd = ('sox {path} -n {remix_part} {compand_part} {reverse} '
+                         'trim {start} {end} {reverse} noiseprof {out_path} &&'
+                         ).format(path=path, out_path=profile_path,
+                                  remix_part=remix_part, reverse=reverse,
+                                  compand_part=compand_part, start=start,
+                                  end=end)
 
-    noisered_part = 'noisered - 0.3' if do_noiseprof else ''
+            noisered_part = 'noisered {} 0.3'.format(profile_path)
+            new_profile = profile_path
+        else:
+            noisered_part = ''
+    else:
+        noisered_part = 'noisered "{}" 0.3'.format(noise_profile)
 
     cmd = ('{noise_cmd} sox {path} {cleaned_path} {remix_part} {compand_part} '
            '{noisered_part} {silence_part} reverse {silence_part} reverse'
@@ -35,7 +55,7 @@ def clean(path):
                    noisered_part=noisered_part, silence_part=silence_part)
     os.system(cmd)
 
-    return cleaned_path
+    return cleaned_path, new_profile
 
 
 def play(path):

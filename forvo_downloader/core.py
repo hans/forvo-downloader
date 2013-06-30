@@ -113,7 +113,23 @@ def main():
 
     if config['clean']:
         print('Cleaning..')
-        cleaned_filename = cleaner.clean(filename)
+
+        username = result['standard_pronunciation']['username']
+        profile = cleaner.find_noise_profile(username)
+
+        if profile is None:
+            print('No noise profile exists for {}. '
+                  'We will try to create one.'.format(username))
+
+        cleaned_filename, new_profile = cleaner.clean(filename, username,
+                                                      noise_profile=profile)
+
+        if profile is None:
+            if new_profile is None:
+                print('Noise profile creation aborted.')
+            else:
+                print('Saved new profile to {}'.format(new_profile))
+
         print('Cleaned pronunciation saved to ./{}'.format(cleaned_filename))
 
 
