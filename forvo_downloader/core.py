@@ -8,6 +8,8 @@ import urllib.parse
 import urllib.request
 import sys
 
+import cleaner
+
 DEFAULT_CONFIG_LOCATION = '~/.forvo_downloader.cfg'
 SEARCH_ENDPOINT = ('http://apifree.forvo.com/key/{api_key}/format/json/action'
                    '/pronounced-words-search/pagesize/100/search/{word}{extra}')
@@ -39,6 +41,9 @@ def parse_config(argv=None):
     parser.add_argument('-l', '--language', metavar='LANGUAGE_CODE',
                         help=('Forvo language code (see '
                               'http://www.forvo.com/languages-codes/)'))
+    parser.add_argument('-n', '--clean', action='store_true', default=False,
+                        help=('Clean the Forvo result (normalize, remove noise,'
+                              ' and trim silence'))
     parser.add_argument('word', metavar='WORD', help='Word to search on Forvo')
     args = parser.parse_args(remaining_argv)
 
@@ -91,7 +96,7 @@ def do_download(result):
     return dest_filename
 
 
-if __name__ == '__main__':
+def main():
     config = parse_config(sys.argv)
     results = do_search(config)
 
@@ -105,3 +110,12 @@ if __name__ == '__main__':
 
     filename = do_download(result)
     print('Saved pronuncuation to ./{}'.format(filename))
+
+    if config['clean']:
+        print('Cleaning..')
+        cleaned_filename = cleaner.clean(filename)
+        print('Cleaned pronunciation saved to ./{}'.format(cleaned_filename))
+
+
+if __name__ == '__main__':
+    sys.exit(main())
