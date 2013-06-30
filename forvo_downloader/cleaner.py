@@ -34,22 +34,24 @@ def clean(path, username, noise_profile=None):
             reverse = 'reverse' if reverse else ''
             profile_path = noise_profile_path(username)
 
-            noise_cmd = ('sox {path} -n {remix_part} {compand_part} {reverse} '
-                         'trim {start} {end} {reverse} noiseprof {out_path} &&'
+            noise_cmd = ('sox "{path}" -n {remix_part} {compand_part} {reverse} '
+                         'trim {start} {end} {reverse} noiseprof "{out_path}" '
+                         '&&'
                          ).format(path=path, out_path=profile_path,
                                   remix_part=remix_part, reverse=reverse,
                                   compand_part=compand_part, start=start,
                                   end=end)
 
-            noisered_part = 'noisered {} 0.3'.format(profile_path)
+            noisered_part = 'noisered "{}" 0.21'.format(profile_path)
             new_profile = profile_path
         else:
             noisered_part = ''
     else:
-        noisered_part = 'noisered "{}" 0.3'.format(noise_profile)
+        noisered_part = 'noisered "{}" 0.21'.format(noise_profile)
 
-    cmd = ('{noise_cmd} sox {path} {cleaned_path} {remix_part} {compand_part} '
-           '{noisered_part} {silence_part} reverse {silence_part} reverse'
+    cmd = ('{noise_cmd} sox "{path}" "{cleaned_path}" {remix_part} '
+           '{compand_part} {noisered_part} {silence_part} reverse '
+           '{silence_part} reverse'
           ).format(noise_cmd=noise_cmd, path=path, cleaned_path=cleaned_path,
                    remix_part=remix_part, compand_part=compand_part,
                    noisered_part=noisered_part, silence_part=silence_part)
